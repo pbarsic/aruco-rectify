@@ -22,11 +22,18 @@ Next, some nice Python packages:
 `pip install matplotlib`  
 `pip install pandas`
 
+
+`draw_markers.py`
 Python script to generate an ArUco target
 
-Python script to detect an ArUco target in an image
+`display_detected_markers.py`
+Python script to display detected ArUco targets in an image
 
+`reproject_squares.py`
 Python script to detect an ArUco target in an image and then rectify the image so that the target is rectangular.
 
+`reproject_video.py`
 Python script to use the system camera as an input, look for ArUco targets, and then rectify the image so that the target is rectangular before displaying.
 
+`aruco_utils.py`
+Utilities for computing the homography that is used in the reproject scripts
