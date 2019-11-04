@@ -19,14 +19,21 @@ def quad_area(data):
     a = -0.5 * (np.cross(-e0, e1, axis = 1) + np.cross(-e2, e3, axis=1))
     return a
 
+
+def detect_markers(frame_bgr, aruco_dict = aruco.DICT_6X6_250):
+    gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+    aruco_dict = aruco.Dictionary_get(aruco_dict)
+    parameters = aruco.DetectorParameters_create()
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+    return corners, ids
+
+
 frame = cv2.imread("_data/aruco_picture_2x4.jpg")
 
 frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
-parameters = aruco.DetectorParameters_create()
-corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+corners, ids = detect_markers(frame_bgr)
+
 frame_markers = aruco.drawDetectedMarkers(frame_bgr.copy(), corners, ids)
 
 plt.figure()
