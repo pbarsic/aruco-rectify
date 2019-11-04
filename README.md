@@ -23,17 +23,18 @@ Next, some nice Python packages:
 `pip install pandas`
 
 
+## Files in this repository:  
 `draw_markers.py`
-Python script to generate an ArUco target
+Python script to generate an ArUco target. There are some parameters inside this script that you will want to edit.
 
 `display_detected_markers.py`
-Python script to display detected ArUco targets in an image
+Python script to display detected ArUco targets in an image. The input image is hard-coded here. This is a debug utility.
 
 `reproject_squares.py`
-Python script to detect an ArUco target in an image and then rectify the image so that the target is rectangular.
+Python script to detect an ArUco target in an image and then rectify the image so that the target is rectangular. The orientation of the bottom edge of the detected target is preserved. The input file is hard-coded, and it doesn't save an output.
 
 `reproject_video.py`
-Python script to use the system camera as an input, look for ArUco targets, and then rectify the image so that the target is rectangular before displaying.
+This is the main thing for this demo. This Python script uses the system camera as an input, look for ArUco targets, and then rectify the image so that the target is rectangular before displaying. The video source ID is hard-coded to 0. If your system camera has a different ID, you will have to modify the script.
 
 `aruco_utils.py`
-Utilities for computing the homography that is used in the reproject scripts
+Utilities for computing the homography that is used in the reproject scripts.
