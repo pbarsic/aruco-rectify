@@ -25,5 +25,19 @@ def detect_markers(frame_bgr, aruco_dict = aruco.DICT_6X6_250):
     return corners, ids
 
 def compute_projectivity(corners):
-    print corners
+    # find the lower-left corner (greatest y-value and least x-value), this will be [0, 0, 1]
+    lower_left = [ c for c in corners if c[0] < corners[:,0].mean() and c[1] > corners[:,1].mean() ][0]
+    # find the lower-right corner (greatest y-value and greatest x-value) this will be [1, 0, 1]
+    lower_right = [ c for c in corners if c[0] > corners[:,0].mean() and c[1] > corners[:,1].mean() ][0]
+    # find the upper-left corner (least y-value and least x-value), this will be [0, 1, 1]
+    upper_left = [ c for c in corners if c[0] < corners[:,0].mean() and c[1] < corners[:,1].mean() ][0]
+    # find the upper-right corner (least y-value and greatest x-value), this will be [1, 1, 1]
+    upper_right = [ c for c in corners if c[0] > corners[:,0].mean() and c[1] < corners[:,1].mean() ][0]
+
+    ordered_corners = np.array([ lower_left, lower_right, upper_left, upper_right ])
+    # figure out an appropriate sacle for the ordered corners.
+    scale = lower_right[0] - lower_left[0]
+    desired_corners = np.array([ [0.0, 0.0], [scale, 0.0], [0.0, scale], [scale, scale] ])
+
+    return cv2.findHomography(ordered_corners, desired_corners)
 
