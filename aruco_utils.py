@@ -36,8 +36,23 @@ def compute_projectivity(corners):
 
     ordered_corners = np.array([ lower_left, lower_right, upper_left, upper_right ])
     # figure out an appropriate sacle for the ordered corners.
-    scale = lower_right[0] - lower_left[0]
-    desired_corners = np.array([ lower_left, lower_left+[scale, 0.0], lower_left + [0, -scale], lower_left+[scale, -scale] ])
+    # this one squares with the corners of the display and scales with the bottom edge
+    # scale = lower_right[0] - lower_left[0]
+    # desired_corners = np.array([ lower_left, lower_left+[scale, 0.0], lower_left + [0, -scale], lower_left+[scale, -scale] ])
+    # this should preserve the scale and orientation of the bottom edge
+    xaxis = np.array(lower_right) - np.array(lower_left)
+    print "xaxis = ", xaxis
+    xlength = np.sqrt(np.dot(xaxis, xaxis))
+    yaxis = np.array([-xaxis[1], xaxis[0]])
+    print "yaxis = ", yaxis
+    new_ul = np.array(lower_left) - yaxis
+    new_ur = new_ul + xaxis
+    desired_corners = np.array([ lower_left, lower_right, new_ul.tolist(), new_ur.tolist() ])
+
+    print "ordered:"
+    print ordered_corners
+    print "desired:"
+    print desired_corners
 
     h, status = cv2.findHomography(ordered_corners, desired_corners)
     return h
