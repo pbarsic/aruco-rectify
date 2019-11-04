@@ -1,6 +1,6 @@
 ## ArUco Orientation
 
-This is a simple project to use ArUco targets to determine a camera orientation relative to a planar surface.
+This is a simple project to use ArUco targets to determine a camera orientation relative to a planar surface. It begins with the sample code from [this website](https://mecaruco2.readthedocs.io/en/latest/notebooks_rst/Aruco/aruco_basics.html).
 
 Paul Barsic  
 November 2019
