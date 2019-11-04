@@ -28,7 +28,8 @@ cv2.imshow("dewarped image", dewarped)
 cv2.imshow("dewarped image", dewarped)
 cv2.waitKey(0)
 
-outputfilename=re.sub('.jpg', '_dewarped.jpg', filename, flags=re.I)
+suffix=re.sub('.*\.', '.', filename)
+outputfilename=re.sub(suffix, '_dewarped' + suffix, filename, flags=re.I)
 cv2.imwrite(outputfilename, dewarped)
 
 
