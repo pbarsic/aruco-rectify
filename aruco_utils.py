@@ -37,7 +37,8 @@ def compute_projectivity(corners):
     ordered_corners = np.array([ lower_left, lower_right, upper_left, upper_right ])
     # figure out an appropriate sacle for the ordered corners.
     scale = lower_right[0] - lower_left[0]
-    desired_corners = np.array([ [0.0, 0.0], [scale, 0.0], [0.0, scale], [scale, scale] ])
+    desired_corners = np.array([ lower_left, lower_left+[scale, 0.0], lower_left + [0, -scale], lower_left+[scale, -scale] ])
 
-    return cv2.findHomography(ordered_corners, desired_corners)
+    h, status = cv2.findHomography(ordered_corners, desired_corners)
+    return h
 
