@@ -17,14 +17,36 @@ def quad_area(data):
     return a
 
 
-def detect_markers(frame_bgr, aruco_dict = aruco.DICT_6X6_250):
+def detect_markers(frame_bgr, aruco_dict = aruco.DICT_4X4_50):
     gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
     aruco_dict = aruco.Dictionary_get(aruco_dict)
     parameters = aruco.DetectorParameters_create()
     corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
     return corners, ids
 
-def compute_projectivity(corners):
+def compute_projectivity_(corners):
+    # find the lower-left corner (greatest y-value and least x-value), this will be [0, 0, 1]
+    lower_left = [ c for c in corners if c[0] < corners[:,0].mean() and c[1] > corners[:,1].mean() ][0]
+    # find the lower-right corner (greatest y-value and greatest x-value) this will be [1, 0, 1]
+    lower_right = [ c for c in corners if c[0] > corners[:,0].mean() and c[1] > corners[:,1].mean() ][0]
+    # find the upper-left corner (least y-value and least x-value), this will be [0, 1, 1]
+    upper_left = [ c for c in corners if c[0] < corners[:,0].mean() and c[1] < corners[:,1].mean() ][0]
+    # find the upper-right corner (least y-value and greatest x-value), this will be [1, 1, 1]
+    upper_right = [ c for c in corners if c[0] > corners[:,0].mean() and c[1] < corners[:,1].mean() ][0]
+
+    ordered_corners = np.array([ lower_left, lower_right, upper_left, upper_right ])
+    # this should preserve the scale and orientation of the bottom edge
+    xaxis = np.array(lower_right) - np.array(lower_left)
+    xlength = np.sqrt(np.dot(xaxis, xaxis))
+    yaxis = np.array([-xaxis[1], xaxis[0]])
+    new_ul = np.array(lower_left) - yaxis
+    new_ur = new_ul + xaxis
+    desired_corners = np.array([ lower_left, lower_right, new_ul.tolist(), new_ur.tolist() ])
+
+    h, status = cv2.findHomography(ordered_corners, desired_corners)
+    return h
+
+def compute_projectivity_level(corners):
     # find the lower-left corner (greatest y-value and least x-value), this will be [0, 0, 1]
     lower_left = [ c for c in corners if c[0] < corners[:,0].mean() and c[1] > corners[:,1].mean() ][0]
     # find the lower-right corner (greatest y-value and greatest x-value) this will be [1, 0, 1]
@@ -37,16 +59,11 @@ def compute_projectivity(corners):
     ordered_corners = np.array([ lower_left, lower_right, upper_left, upper_right ])
     # figure out an appropriate sacle for the ordered corners.
     # this one squares with the corners of the display and scales with the bottom edge
-    # scale = lower_right[0] - lower_left[0]
-    # desired_corners = np.array([ lower_left, lower_left+[scale, 0.0], lower_left + [0, -scale], lower_left+[scale, -scale] ])
-    # this should preserve the scale and orientation of the bottom edge
-    xaxis = np.array(lower_right) - np.array(lower_left)
-    xlength = np.sqrt(np.dot(xaxis, xaxis))
-    yaxis = np.array([-xaxis[1], xaxis[0]])
-    new_ul = np.array(lower_left) - yaxis
-    new_ur = new_ul + xaxis
-    desired_corners = np.array([ lower_left, lower_right, new_ul.tolist(), new_ur.tolist() ])
+    scale = lower_right[0] - lower_left[0]
+    desired_corners = np.array([ lower_left, lower_left+[scale, 0.0], lower_left + [0, -scale], lower_left+[scale, -scale] ])
 
     h, status = cv2.findHomography(ordered_corners, desired_corners)
     return h
 
+def compute_projectivity(corners):
+    return compute_projectivity_level(corners)
